@@ -23,13 +23,6 @@ func (c *code) BodyFromFile(path string) error {
 	return nil
 }
 
-func (c *code) Run() error {
-	L := lua.NewState()
-	defer L.Close()
-
-	return nil
-}
-
 type actionNode struct {
 	code     string
 	label    string
@@ -84,6 +77,14 @@ func (an *actionNode) SetCode(s string) {
 	an.code = s
 }
 
+func (an *actionNode) SetNextNode(nn *ExecutionNode) {
+	an.nextNode = nn
+}
+
+func (an *actionNode) NextNode() *ExecutionNode {
+	return an.nextNode
+}
+
 func convertToLuaValue(value any) lua.LValue {
 	switch v := value.(type) {
 	case string:
@@ -109,12 +110,4 @@ func convertFromLuaValue(value lua.LValue) any {
 	default:
 		return nil
 	}
-}
-
-func (an *actionNode) SetNextNode(nn *ExecutionNode) {
-	an.nextNode = nn
-}
-
-func (an *actionNode) NextNode() *ExecutionNode {
-	return an.nextNode
 }
