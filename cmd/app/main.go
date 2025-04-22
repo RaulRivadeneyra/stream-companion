@@ -1,20 +1,34 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"fmt"
+	"os"
 
+	"github.com/RaulRivadeneyra/stream-companion/internal/nodes"
 	envmanager "github.com/RaulRivadeneyra/stream-companion/internal/pkg/env-manager"
-	"github.com/RaulRivadeneyra/stream-companion/internal/routes"
 )
 
 const OAUTH2_TOKEN_ENDPOINT = "https://id.twitch.tv/oauth2/token"
 
 func main() {
 	envmanager.LoadEnvs()
+	// mux := routes.NewRouter()
+	//
+	// log.Println("Listening...")
+	// http.ListenAndServe(":3000", mux)
+	node := nodes.NewActionNode()
 
-	mux := routes.NewRouter()
+	content, err := os.ReadFile("ABS PATH TO ../../actions/test-1.lua")
+	if err != nil {
+		panic(err)
+	}
+	node.SetCode(string(content))
 
-	log.Println("Listening...")
-	http.ListenAndServe(":3000", mux)
+	inputs := map[string]any{
+		"name": "Yujiko",
+	}
+
+	result, _ := node.Execute(inputs)
+
+	fmt.Println(result)
 }
