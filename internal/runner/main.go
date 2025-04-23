@@ -5,16 +5,12 @@ import "github.com/RaulRivadeneyra/stream-companion/internal/nodes"
 type Variables = map[string]any
 type Condition = func(input Variables) (bool, error)
 
-type BranchingNode struct {
-	branches map[any]nodes.ExecutionNode
-}
-
 type Runner struct {
 	sharedVariables Variables
-	startingNode    *nodes.ExecutionNode
+	startingNode    nodes.INode[any]
 }
 
-func (r *Runner) SetStartingNode(node *nodes.ExecutionNode) {
+func (r *Runner) SetStartingNode(node nodes.INode[any]) {
 	r.startingNode = node
 }
 
@@ -37,15 +33,4 @@ func (r *Runner) Run() (any, error) {
 	// }
 
 	return nil, nil
-}
-
-type verificationResult = struct {
-	isValid bool
-	issues  []string
-}
-
-func (r *Runner) Verify() verificationResult {
-	return verificationResult{
-		isValid: true,
-	}
 }
