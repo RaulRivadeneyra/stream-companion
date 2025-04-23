@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/RaulRivadeneyra/stream-companion/internal/nodes"
 	envmanager "github.com/RaulRivadeneyra/stream-companion/internal/pkg/env-manager"
@@ -16,7 +17,8 @@ func main() {
 	// log.Println("Listening...")
 	// http.ListenAndServe(":3000", mux)
 
-	content, err := os.ReadFile(os.Getenv("PROJECT_PATH") + "/actions/test-1.lua")
+	projectPath, _ := os.Getwd()
+	content, err := os.ReadFile(filepath.Join(projectPath, "/actions/test-1.lua"))
 	if err != nil {
 		panic(err)
 	}
@@ -41,7 +43,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	content, err = os.ReadFile(os.Getenv("PROJECT_PATH") + "/actions/test-2.lua")
+	content, err = os.ReadFile(filepath.Join(projectPath, "/actions/test-2.lua"))
 	if err != nil {
 		panic(err)
 	}
