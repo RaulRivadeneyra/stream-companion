@@ -30,9 +30,7 @@ func main() {
 	globalNode := nodes.NewActionNode()
 	globalNode.SetLabel("GLOBAL")
 
-	sv := nodes.NewSharedVariable(globalNode)
-	sv.SetName("name")
-	sv.SetString("Yujiko")
+	sv := nodes.NewSharedVariable(globalNode, "name", "Yujiko")
 
 	svc := nodes.NewSharedVariableCollection()
 

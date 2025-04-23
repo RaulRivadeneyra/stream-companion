@@ -8,76 +8,76 @@ import (
 )
 
 type SharedVariable struct {
-	name    string
-	id      uuid.UUID
-	luaType lua.LValueType
-	value   any
-	nodeRef INode[any]
+	name     string
+	id       uuid.UUID
+	luaType  lua.LValueType
+	value    any
+	luaValue lua.LValue
+	nodeRef  INode[any]
 }
 
-func NewSharedVariable(n INode[any]) *SharedVariable {
-	return &SharedVariable{
+func NewSharedVariable(node INode[any], name string, value any) *SharedVariable {
+
+	sharedVar := SharedVariable{
 		id:      uuid.New(),
-		nodeRef: n,
+		nodeRef: node,
+		name:    name,
 	}
+
+	setValue(&sharedVar, value)
+
+	return &sharedVar
 }
 
-func (sv *SharedVariable) GetName() string {
-	return sv.name
+func (sharedVar *SharedVariable) GetName() string {
+	return sharedVar.name
 }
 
-func (sv *SharedVariable) SetName(name string) {
-	sv.name = name
+func (sharedVar *SharedVariable) FullName() string {
+	nodeLabel := sharedVar.nodeRef.GetLabel()
+	return fmt.Sprintf("%s_%s", nodeLabel, sharedVar.name)
 }
 
-func (sv *SharedVariable) SetBool(b bool) {
-	sv.luaType = lua.LTBool
-	sv.value = b
-}
-func (sv *SharedVariable) SetFloat(f float64) {
-	sv.luaType = lua.LTNumber
-	sv.value = f
-}
-func (sv *SharedVariable) SetString(s string) {
-	sv.luaType = lua.LTString
-	sv.value = s
+func (sharedVar *SharedVariable) GetValue() any {
+	return sharedVar.value
 }
 
-func (sv *SharedVariable) FullName() string {
-	nodeLabel := sv.nodeRef.GetLabel()
-	return fmt.Sprintf("%s_%s", nodeLabel, sv.name)
+func (sharedVar *SharedVariable) GetLuaValue() lua.LValue {
+	return sharedVar.luaValue
 }
 
-func (sv *SharedVariable) ToLuaValue() lua.LValue {
-	switch v := sv.value.(type) {
+func (sharedVar *SharedVariable) GetLuaType() lua.LValueType {
+	return sharedVar.luaType
+}
+
+func coerceValue(value any) (lua.LValueType, lua.LValue, any, bool) {
+	switch value := value.(type) {
 	case string:
-		return lua.LString(v)
+		return lua.LTString, lua.LString(value), value, true
 	case float64:
-		return lua.LNumber(v)
+		return lua.LTNumber, lua.LNumber(value), value, true
 	case bool:
-		return lua.LBool(v)
-	default:
-		panic(fmt.Sprintf("Mismatched Go and Lua value type: %s - %s", v, sv.luaType))
-	}
-}
-
-func (sv *SharedVariable) FromLuaValue(lv lua.LValue) {
-	switch v := lv.(type) {
+		return lua.LTBool, lua.LBool(value), value, true
 	case lua.LString:
-		sv.SetString(lua.LVAsString(v))
+		return lua.LTString, lua.LString(value), lua.LVAsString(value), true
 	case lua.LNumber:
-		sv.SetFloat(float64(lua.LVAsNumber(v)))
+		return lua.LTNumber, lua.LNumber(value), float64(lua.LVAsNumber(value)), true
 	case lua.LBool:
-		sv.SetBool(lua.LVAsBool(v))
+		return lua.LTBool, lua.LBool(value), lua.LVAsBool(value), true
 	default:
-		panic(fmt.Sprintf(`LValueType '%s' is not allowed`, v.Type()))
+		return 0, nil, nil, false
 	}
 }
 
-func (sv *SharedVariable) GetValue() any {
-	return sv.value
-}
+func setValue(sharedVar *SharedVariable, value any) {
 
-func (sv *SharedVariable) GetLuaType() lua.LValueType {
-	return sv.luaType
+	luaType, luaVal, rawVal, canCoerce := coerceValue(value)
+
+	if !canCoerce {
+		panic(fmt.Sprintf("Passed value doesn't match any valid type: %s ", value))
+	}
+
+	sharedVar.luaType = luaType
+	sharedVar.luaValue = luaVal
+	sharedVar.value = rawVal
 }

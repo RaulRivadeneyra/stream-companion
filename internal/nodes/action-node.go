@@ -63,7 +63,7 @@ func setInputs(L *lua.LState, svc *SharedVariableCollection) {
 	inputsTable := L.NewTable()
 
 	for _, v := range svc.GetSharedVariableList() {
-		L.SetField(inputsTable, v.FullName(), v.ToLuaValue())
+		L.SetField(inputsTable, v.FullName(), v.GetLuaValue())
 	}
 
 	readonlyInput := luahelpers.ReadOnlyValue(L, inputsTable)
@@ -85,9 +85,7 @@ func (an *ActionNode) Execute(svc *SharedVariableCollection) error {
 	}
 
 	L.ForEach(output, func(k, v lua.LValue) {
-		sv := NewSharedVariable(an)
-		sv.SetName(k.String())
-		sv.FromLuaValue(v)
+		sv := NewSharedVariable(an, k.String(), v)
 		svc.AddSharedVariable(sv)
 	})
 
