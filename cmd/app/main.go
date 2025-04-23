@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/RaulRivadeneyra/stream-companion/internal/nodes"
@@ -16,19 +15,44 @@ func main() {
 	//
 	// log.Println("Listening...")
 	// http.ListenAndServe(":3000", mux)
-	node := nodes.NewActionNode()
 
-	content, err := os.ReadFile("ABS PATH TO ../../actions/test-1.lua")
+	content, err := os.ReadFile(os.Getenv("PROJECT_PATH") + "/actions/test-1.lua")
 	if err != nil {
 		panic(err)
 	}
-	node.SetCode(string(content))
 
-	inputs := map[string]any{
-		"name": "Yujiko",
+	node := nodes.NewActionNode()
+	node.SetLabel("testNode")
+	node.SetValue(string(content))
+
+	globalNode := nodes.NewActionNode()
+	globalNode.SetLabel("GLOBAL")
+
+	sv := nodes.NewSharedVariable(globalNode)
+	sv.SetName("name")
+	sv.SetString("Yujiko")
+
+	svc := nodes.NewSharedVariableCollection()
+
+	svc.AddSharedVariable(sv)
+
+	err = node.Execute(svc)
+
+	if err != nil {
+		panic(err)
+	}
+	content, err = os.ReadFile(os.Getenv("PROJECT_PATH") + "/actions/test-2.lua")
+	if err != nil {
+		panic(err)
+	}
+	node2 := nodes.NewActionNode()
+	node2.SetLabel("testNode2")
+	node2.SetValue(string(content))
+
+	err = node2.Execute(svc)
+
+	if err != nil {
+		panic(err)
 	}
 
-	result, _ := node.Execute(inputs)
-
-	fmt.Println(result)
 }
