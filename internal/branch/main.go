@@ -14,7 +14,7 @@ type Branch interface {
 
 type BranchBuilder struct {
 	branchType BranchType
-	nextNode   *nodes.ExecutionNode
+	nextNode   nodes.INode[any]
 }
 
 func NewBranchBuilder() *BranchBuilder {
