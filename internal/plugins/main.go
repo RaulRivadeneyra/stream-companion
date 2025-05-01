@@ -9,8 +9,6 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-type PluginRegistry map[string]lua.LValue
-
 func LoadPlugins(root string, luaState *lua.LState) (lua.LValue, error) {
 	pluginsTable := luaState.NewTable()
 
