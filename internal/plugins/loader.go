@@ -1,7 +1,6 @@
 package plugins
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -29,7 +28,6 @@ func LoadPlugins(root string, luaState *lua.LState) (lua.LValue, error) {
 
 		compiledFn, err := luaState.LoadFile(path)
 
-		fmt.Println("0")
 		if err != nil {
 			log.Printf("Syntax error in %s: %v", path, err)
 			return nil
@@ -50,7 +48,7 @@ func LoadPlugins(root string, luaState *lua.LState) (lua.LValue, error) {
 		}
 		parts := strings.Split(relativePath, string(os.PathSeparator))
 		current := pluginsTable
-		fmt.Println("2")
+
 		for i := range len(parts) - 1 {
 			part := parts[i]
 			if sub := current.RawGetString(part); sub.Type() == lua.LTTable {
