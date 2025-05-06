@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/RaulRivadeneyra/stream-companion/core"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -12,21 +13,9 @@ type Workflow struct {
 	Nodes map[string]Node
 }
 
-type ExecutionContext struct {
-	Results map[string]*lua.LTable
-}
-
-type ExecutionResult struct {
-	Context       *ExecutionContext // All node results
-	FinalNodeID   string            // ID of the last executed node
-	FinalResult   *lua.LTable       // The last node’s result (if any)
-	Error         error             // Error that stopped execution, if any
-	ExecutionPath []string          // Ordered list of node IDs executed
-}
-
-func ExecuteWorkflow(workflow Workflow, plugins lua.LValue) ExecutionResult {
-	ctx := &ExecutionContext{Results: make(map[string]*lua.LTable)}
-	result := ExecutionResult{
+func ExecuteWorkflow(workflow Workflow, plugins lua.LValue) core.ExecutionResult {
+	ctx := &core.ExecutionContext{Results: make(map[string]*lua.LTable)}
+	result := core.ExecutionResult{
 		Context:       ctx,
 		ExecutionPath: []string{},
 	}
@@ -66,7 +55,7 @@ func ExecuteWorkflow(workflow Workflow, plugins lua.LValue) ExecutionResult {
 }
 
 func ResolveInputs(
-	inputMap map[string]string, ctx *ExecutionContext,
+	inputMap map[string]string, ctx *core.ExecutionContext,
 ) (map[string]lua.LValue, error) {
 	resolved := make(map[string]lua.LValue)
 

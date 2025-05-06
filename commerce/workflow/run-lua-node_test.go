@@ -3,7 +3,7 @@ package workflow_test
 import (
 	"testing"
 
-	"github.com/RaulRivadeneyra/stream-companion/internal/workflow"
+	"github.com/RaulRivadeneyra/stream-companion/commerce/workflow"
 	lua "github.com/yuin/gopher-lua"
 )
 

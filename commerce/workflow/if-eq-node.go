@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/RaulRivadeneyra/stream-companion/core"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -23,7 +24,7 @@ func (n *IfEqNode) Type() string {
 	return "if_eq"
 }
 
-func (n *IfEqNode) Execute(ctx *ExecutionContext, plugins lua.LValue) (string, error) {
+func (n *IfEqNode) Execute(ctx *core.ExecutionContext, plugins lua.LValue) (string, error) {
 	// 1. Resolve inputs
 	inputs, err := ResolveInputs(n.Inputs, ctx)
 	if err != nil {

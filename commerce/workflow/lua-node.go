@@ -1,6 +1,9 @@
 package workflow
 
-import lua "github.com/yuin/gopher-lua"
+import (
+	"github.com/RaulRivadeneyra/stream-companion/core"
+	lua "github.com/yuin/gopher-lua"
+)
 
 type LuaNode struct {
 	NodeID   string
@@ -18,7 +21,7 @@ func (n *LuaNode) Type() string {
 	return "lua"
 }
 
-func (n *LuaNode) Execute(ctx *ExecutionContext, plugins lua.LValue) (string, error) {
+func (n *LuaNode) Execute(ctx *core.ExecutionContext, plugins lua.LValue) (string, error) {
 	inputs, err := ResolveInputs(n.Inputs, ctx)
 	if err != nil {
 		return "", err

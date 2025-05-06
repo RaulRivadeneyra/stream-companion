@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/RaulRivadeneyra/stream-companion/core"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -15,7 +16,7 @@ type StartNode struct {
 func (n *StartNode) ID() string   { return n.NodeID }
 func (n *StartNode) Type() string { return "start" }
 
-func (n *StartNode) Execute(ctx *ExecutionContext, plugins lua.LValue) (string, error) {
+func (n *StartNode) Execute(ctx *core.ExecutionContext, plugins lua.LValue) (string, error) {
 	if n.Next == "" {
 		return "", fmt.Errorf("start node must define a `next` field")
 	}

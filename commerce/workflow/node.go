@@ -3,13 +3,14 @@ package workflow
 import (
 	"fmt"
 
+	"github.com/RaulRivadeneyra/stream-companion/core"
 	lua "github.com/yuin/gopher-lua"
 )
 
 type Node interface {
 	ID() string
 	Type() string
-	Execute(ctx *ExecutionContext, plugins lua.LValue) (next string, err error)
+	Execute(ctx *core.ExecutionContext, plugins lua.LValue) (next string, err error)
 	ToJSON() NodeJSON
 }
 
