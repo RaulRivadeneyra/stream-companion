@@ -16,7 +16,6 @@ func LoadPlugins(root string, luaState *lua.LState) (lua.LValue, error) {
 		if err != nil {
 			log.Printf("Error walking path %s: %v", path, err)
 		}
-
 		if dirEntry.IsDir() || !strings.HasSuffix(dirEntry.Name(), ".lua") {
 			return nil
 		}
@@ -27,8 +26,26 @@ func LoadPlugins(root string, luaState *lua.LState) (lua.LValue, error) {
 			return nil
 		}
 
-		fn, err := luaState.LoadFile(path)
+		compiledFn, err := luaState.LoadFile(path)
 
+		if err != nil {
+			log.Printf("Syntax error in %s: %v", path, err)
+			return nil
+		}
+
+		luaState.Push(compiledFn)
+		err = luaState.PCall(0, 1, nil) // execute file and capture returned value
+		if err != nil {
+			log.Printf("Runtime error in %s: %v", path, err)
+			return nil
+		}
+
+		plugin := luaState.Get(-1)
+		luaState.Pop(1)
+		if plugin.Type() != lua.LTFunction {
+			log.Printf("Plugin %s does not return a function", path)
+			return nil
+		}
 		parts := strings.Split(relativePath, string(os.PathSeparator))
 		current := pluginsTable
 
@@ -44,7 +61,7 @@ func LoadPlugins(root string, luaState *lua.LState) (lua.LValue, error) {
 		}
 
 		pluginName := strings.TrimSuffix(parts[len(parts)-1], ".lua")
-		current.RawSetString(pluginName, fn)
+		current.RawSetString(pluginName, plugin)
 
 		log.Printf("Validated & registered plugin: plugins.%s", strings.Join(parts, "."))
 		return nil
