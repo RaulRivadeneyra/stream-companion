@@ -1,4 +1,4 @@
-package executor
+package workflow
 
 import lua "github.com/yuin/gopher-lua"
 

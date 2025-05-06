@@ -1,9 +1,9 @@
-package executor_test
+package workflow_test
 
 import (
 	"testing"
 
-	"github.com/RaulRivadeneyra/stream-companion/internal/executor"
+	"github.com/RaulRivadeneyra/stream-companion/internal/workflow"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -32,7 +32,7 @@ func TestRunLuaNode_ReturnsTable(t *testing.T) {
 		return { result = msg, next = "done" }
 	`
 
-	ret, err := executor.RunLuaNode(code, inputs, plugins)
+	ret, err := workflow.RunLuaNode(code, inputs, plugins)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -53,7 +53,7 @@ func TestRunLuaNode_HandlesMissingNext(t *testing.T) {
 
 	code := `return { result = 123 }`
 
-	ret, err := executor.RunLuaNode(code, nil, L.NewTable())
+	ret, err := workflow.RunLuaNode(code, nil, L.NewTable())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -74,7 +74,7 @@ func TestRunLuaNode_ReturnsNonTable(t *testing.T) {
 
 	code := `return "not a table"`
 
-	ret, err := executor.RunLuaNode(code, nil, L.NewTable())
+	ret, err := workflow.RunLuaNode(code, nil, L.NewTable())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

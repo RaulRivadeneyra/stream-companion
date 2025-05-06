@@ -1,4 +1,4 @@
-package executor_test
+package workflow_test
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/RaulRivadeneyra/stream-companion/internal/executor"
+	"github.com/RaulRivadeneyra/stream-companion/internal/workflow"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -20,19 +20,19 @@ func TestExecuteWorkflow_SimpleLinearChain(t *testing.T) {
 	plugins := L.NewTable()
 
 	// Build workflow
-	workflow := executor.Workflow{
-		Nodes: map[string]executor.Node{
-			"start": &executor.StartNode{
+	workflow := workflow.Workflow{
+		Nodes: map[string]workflow.Node{
+			"start": &workflow.StartNode{
 				NodeID: "start",
 				Next:   "get_name",
 			},
-			"get_name": &executor.LuaNode{
+			"get_name": &workflow.LuaNode{
 				NodeID: "get_name",
 				Source: `return { name = "Yujiko" }`,
 				Inputs: map[string]string{},
 				Next:   "format_message",
 			},
-			"format_message": &executor.LuaNode{
+			"format_message": &workflow.LuaNode{
 				NodeID: "format_message",
 				Source: `return { result = "Hello " .. input.name }`,
 				Inputs: map[string]string{
@@ -43,7 +43,7 @@ func TestExecuteWorkflow_SimpleLinearChain(t *testing.T) {
 		},
 	}
 
-	result := executor.ExecuteWorkflow(workflow, plugins)
+	result := workflow.ExecuteWorkflow(workflow, plugins)
 
 	if result.Error != nil {
 		t.Fatalf("Workflow failed at node %s: %v", result.FinalNodeID, result.Error)
@@ -73,19 +73,19 @@ func TestExecuteWorkflow_BranchingWithIfEq(t *testing.T) {
 
 	plugins := L.NewTable()
 
-	workflow := executor.Workflow{
-		Nodes: map[string]executor.Node{
-			"start": &executor.StartNode{
+	workflow := workflow.Workflow{
+		Nodes: map[string]workflow.Node{
+			"start": &workflow.StartNode{
 				NodeID: "start",
 				Next:   "get_type",
 			},
-			"get_type": &executor.LuaNode{
+			"get_type": &workflow.LuaNode{
 				NodeID: "get_type",
 				Source: `return { type = "electric" }`,
 				Inputs: map[string]string{},
 				Next:   "check_type",
 			},
-			"check_type": &executor.IfEqNode{
+			"check_type": &workflow.IfEqNode{
 				NodeID: "check_type",
 				Inputs: map[string]string{
 					"a": "input.get_type.type",
@@ -94,13 +94,13 @@ func TestExecuteWorkflow_BranchingWithIfEq(t *testing.T) {
 				True:  "handle_electric",
 				False: "handle_other",
 			},
-			"handle_electric": &executor.LuaNode{
+			"handle_electric": &workflow.LuaNode{
 				NodeID: "handle_electric",
 				Source: `return { result = "⚡ it’s electric!" }`,
 				Inputs: map[string]string{},
 				Next:   "",
 			},
-			"handle_other": &executor.LuaNode{
+			"handle_other": &workflow.LuaNode{
 				NodeID: "handle_other",
 				Source: `return { result = "🔥 not electric." }`,
 				Inputs: map[string]string{},
@@ -109,7 +109,7 @@ func TestExecuteWorkflow_BranchingWithIfEq(t *testing.T) {
 		},
 	}
 
-	result := executor.ExecuteWorkflow(workflow, plugins)
+	result := workflow.ExecuteWorkflow(workflow, plugins)
 
 	if result.Error != nil {
 		t.Fatalf("Workflow failed at node %s: %v", result.FinalNodeID, result.Error)
@@ -127,7 +127,7 @@ func TestExecuteWorkflow_BranchingWithIfEq(t *testing.T) {
 		t.Errorf("Unexpected final node: %s", result.FinalNodeID)
 	}
 }
-func TestWorkflowExecutor_ExecutesFromJSON(t *testing.T) {
+func TestWorkflowworkflow_ExecutesFromJSON(t *testing.T) {
 	jsonData := `
 	{
 		"nodes": [
@@ -138,28 +138,28 @@ func TestWorkflowExecutor_ExecutesFromJSON(t *testing.T) {
 	}`
 
 	var raw struct {
-		Nodes []executor.NodeJSON `json:"nodes"`
+		Nodes []workflow.NodeJSON `json:"nodes"`
 	}
 	if err := json.Unmarshal([]byte(jsonData), &raw); err != nil {
 		t.Fatalf("Invalid JSON: %v", err)
 	}
 
-	nodesMap := map[string]executor.Node{}
+	nodesMap := map[string]workflow.Node{}
 	for _, nj := range raw.Nodes {
-		node, err := executor.FromJSON(nj)
+		node, err := workflow.FromJSON(nj)
 		if err != nil {
 			t.Fatalf("Invalid node: %v", err)
 		}
 		nodesMap[nj.ID] = node
 	}
 
-	workflow := executor.Workflow{Nodes: nodesMap}
+	workflow := workflow.Workflow{Nodes: nodesMap}
 
 	L := lua.NewState()
 	defer L.Close()
 
 	plugins := L.NewTable()
-	result := executor.ExecuteWorkflow(workflow, plugins)
+	result := workflow.ExecuteWorkflow(workflow, plugins)
 
 	if result.Error != nil {
 		t.Fatalf("Unexpected error: %v", result.Error)
@@ -172,22 +172,22 @@ func TestWorkflowExecutor_ExecutesFromJSON(t *testing.T) {
 	}
 }
 
-func TestWorkflowExecutor_LogsExecutionPath(t *testing.T) {
+func TestWorkflowworkflow_LogsExecutionPath(t *testing.T) {
 	var buf bytes.Buffer
 	log.SetOutput(&buf)
 	defer log.SetOutput(os.Stderr)
 
-	workflow := executor.Workflow{
-		Nodes: map[string]executor.Node{
-			"start": &executor.StartNode{NodeID: "start", Next: "say"},
-			"say":   &executor.LuaNode{NodeID: "say", Source: `return { result = "yo" }`, Inputs: map[string]string{}},
+	workflow := workflow.Workflow{
+		Nodes: map[string]workflow.Node{
+			"start": &workflow.StartNode{NodeID: "start", Next: "say"},
+			"say":   &workflow.LuaNode{NodeID: "say", Source: `return { result = "yo" }`, Inputs: map[string]string{}},
 		},
 	}
 
 	L := lua.NewState()
 	plugins := L.NewTable()
 
-	result := executor.ExecuteWorkflow(workflow, plugins)
+	result := workflow.ExecuteWorkflow(workflow, plugins)
 
 	if result.Error != nil {
 		t.Fatalf("Execution failed: %v", result.Error)
@@ -197,18 +197,18 @@ func TestWorkflowExecutor_LogsExecutionPath(t *testing.T) {
 	}
 }
 
-func TestWorkflowExecutor_TerminatesGracefullyOnMissingNext(t *testing.T) {
-	workflow := executor.Workflow{
-		Nodes: map[string]executor.Node{
-			"start": &executor.StartNode{NodeID: "start", Next: "one"},
-			"one":   &executor.LuaNode{NodeID: "one", Source: `return { result = "done" }`, Inputs: map[string]string{}},
+func TestWorkflowworkflow_TerminatesGracefullyOnMissingNext(t *testing.T) {
+	workflow := workflow.Workflow{
+		Nodes: map[string]workflow.Node{
+			"start": &workflow.StartNode{NodeID: "start", Next: "one"},
+			"one":   &workflow.LuaNode{NodeID: "one", Source: `return { result = "done" }`, Inputs: map[string]string{}},
 		},
 	}
 
 	L := lua.NewState()
 	plugins := L.NewTable()
 
-	result := executor.ExecuteWorkflow(workflow, plugins)
+	result := workflow.ExecuteWorkflow(workflow, plugins)
 
 	if result.Error != nil {
 		t.Fatalf("Should have terminated cleanly, but got error: %v", result.Error)
@@ -218,11 +218,11 @@ func TestWorkflowExecutor_TerminatesGracefullyOnMissingNext(t *testing.T) {
 	}
 }
 
-func TestWorkflowExecutor_HandlesNodeFailure(t *testing.T) {
-	workflow := executor.Workflow{
-		Nodes: map[string]executor.Node{
-			"start": &executor.StartNode{NodeID: "start", Next: "fail"},
-			"fail": &executor.LuaNode{
+func TestWorkflowworkflow_HandlesNodeFailure(t *testing.T) {
+	workflow := workflow.Workflow{
+		Nodes: map[string]workflow.Node{
+			"start": &workflow.StartNode{NodeID: "start", Next: "fail"},
+			"fail": &workflow.LuaNode{
 				NodeID: "fail",
 				Source: `return { result =  }`, // will error
 				Inputs: map[string]string{},
@@ -233,7 +233,7 @@ func TestWorkflowExecutor_HandlesNodeFailure(t *testing.T) {
 	L := lua.NewState()
 	plugins := L.NewTable()
 
-	result := executor.ExecuteWorkflow(workflow, plugins)
+	result := workflow.ExecuteWorkflow(workflow, plugins)
 
 	if result.Error == nil {
 		t.Fatal("Expected error from failing node, got nil")
