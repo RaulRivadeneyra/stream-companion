@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	envmanager "github.com/RaulRivadeneyra/stream-companion/internal/pkg/env-manager"
-	"github.com/RaulRivadeneyra/stream-companion/internal/routes"
+	"github.com/RaulRivadeneyra/stream-companion/api/routes"
+	envmanager "github.com/RaulRivadeneyra/stream-companion/pkg/env-manager"
 )
 
 const OAUTH2_TOKEN_ENDPOINT = "https://id.twitch.tv/oauth2/token"

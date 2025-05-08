@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/RaulRivadeneyra/stream-companion/internal/plugins"
+	"github.com/RaulRivadeneyra/stream-companion/commerce/plugins"
 	lua "github.com/yuin/gopher-lua"
 )
 

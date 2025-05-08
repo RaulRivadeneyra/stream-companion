@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/RaulRivadeneyra/stream-companion/internal/connectors/common"
-	grantflow "github.com/RaulRivadeneyra/stream-companion/internal/connectors/grant-flow"
+	"github.com/RaulRivadeneyra/stream-companion/commerce/connectors/common"
+	grantflow "github.com/RaulRivadeneyra/stream-companion/commerce/connectors/grant-flow"
 )
 
 const OAUTH2_TOKEN_ENDPOINT = "https://id.twitch.tv/oauth2/token"

@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/RaulRivadeneyra/stream-companion/internal/connectors/common"
+	"github.com/RaulRivadeneyra/stream-companion/commerce/connectors/common"
 )
 
 const OAUTH2_TOKEN_ENDPOINT = "https://id.twitch.tv/oauth2/token"

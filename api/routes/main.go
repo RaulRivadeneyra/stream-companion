@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/RaulRivadeneyra/stream-companion/internal/connectors/twitch"
+	"github.com/RaulRivadeneyra/stream-companion/commerce/connectors/twitch"
 )
 
 const IndexURI = "/"

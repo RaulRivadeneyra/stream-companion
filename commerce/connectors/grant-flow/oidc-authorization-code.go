@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/RaulRivadeneyra/stream-companion/internal/connectors/common"
+	"github.com/RaulRivadeneyra/stream-companion/commerce/connectors/common"
 )
 
 type AuthorizationCodeResponse struct {
